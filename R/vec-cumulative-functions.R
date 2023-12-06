@@ -62,10 +62,21 @@ cvar <- function(.x) {
 #'
 
 cskewness <- function(.x) {
-  skewness <- function(.x) {
-    sqrt(length(.x)) * sum((.x - mean(.x))^3) / (sum((.x - mean(.x))^2)^(3 / 2))
-  }
-  sapply(seq_along(.x), function(k, z) skewness(z[1:k]), z = .x)
+  n <- length(.x)
+  csumx <- base::cumsum(.x)
+  csumx2 <- base::cumsum(.x^2)
+  csumx3 <- base::cumsum(.x^3)
+  cmeanx <- cmean(.x)
+
+  order3 <- csumx3 - (1:n) * cmeanx^3
+  order2 <- -3 * cmeanx * csumx2 + 3 * cmeanx^2 * csumx
+  num <- order3 + order2
+
+  order2 <- csumx2 + (1:n) * cmeanx^2
+  order1 <- -2 * cmeanx * csumx
+  den <- order2 + order1
+
+  sqrt(1:n) * num / den^(3/2)
 }
 
 #' Cumulative Kurtosis
@@ -94,10 +105,23 @@ cskewness <- function(.x) {
 #'
 
 ckurtosis <- function(.x) {
-  kurtosis <- function(.x) {
-    length(.x) * sum((.x - mean(.x))^4) / (sum((.x - mean(.x))^2)^2)
-  }
-  sapply(seq_along(.x), function(k, z) kurtosis(z[1:k]), z = .x)
+  n <- length(.x)
+  csumx <- base::cumsum(.x)
+  csumx2 <- base::cumsum(.x^2)
+  csumx3 <- base::cumsum(.x^3)
+  csumx4 <- base::cumsum(.x^4)
+  cmeanx <- cmean(.x)
+
+  order4 <- csumx4 + (1:n) * cmeanx^4
+  order3 <- -4 * csumx3 * cmean(.x) - 4 * csumx * cmean(.x)^3
+  order2 <- 6 * csumx2 * cmean(.x)^2
+  num <- order4 + order3 + order2
+
+  order2 <- csumx2 + (1:n) * cmeanx^2
+  order1 <- -2 * cmeanx * csumx
+  den <- (order2 + order1)^2
+
+  (1:n) * num / den
 }
 
 #' Cumulative Standard Deviation
